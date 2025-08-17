@@ -27,8 +27,38 @@
       <li><a href="https://www.tiktok.com/@narodowy_3d?_t=ZN-8yvvRLjZMQQ&_r=1" target="_blank" rel="noopener">TikTok</a></li>
       <li><a href="https://www.youtube.com/@Narodowy_3d" target="_blank" rel="noopener">YouTube</a></li>
     </ul>
-    <footer>© <span id="y"></span> Narodowy 3D</footer>
+    <footer>
+  © <span id="y"></span> Narodowy 3D
+  <span aria-hidden="true"> • </span>
+  Odwiedziny: <span id="visits">—</span>
+</footer>
   </main>
-  <script>document.getElementById('y').textContent=new Date().getFullYear()</script>
+  <script>
+  // Nazwa unikalna dla Twojej strony
+  const NS  = 'narodowy3d.github.io';  // <- zmień na swój login.github.io
+  const KEY = 'linki';
+
+  const LS_KEY = 'countapi_last_hit';
+  const last = Number(localStorage.getItem(LS_KEY) || 0);
+  const twelveHours = 12 * 60 * 60 * 1000;
+  const shouldHit = Date.now() - last > twelveHours;
+
+  const url = `https://api.countapi.xyz/${shouldHit ? 'hit' : 'get'}/` +
+              `${encodeURIComponent(NS)}/${encodeURIComponent(KEY)}`;
+
+  fetch(url)
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('visits').textContent =
+        (d.value ?? d.count ?? 0).toLocaleString('pl-PL');
+      if (shouldHit) localStorage.setItem(LS_KEY, String(Date.now()));
+    })
+    .catch(() => {
+      document.getElementById('visits').textContent = '—';
+    });
+
+  // Rok w stopce
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
 </body>
 </html>
